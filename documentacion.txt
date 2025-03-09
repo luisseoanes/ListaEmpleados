@@ -1,0 +1,27 @@
+Investigación sobre las listas doblemente ligadas:
+
+1. ¿Qué son las listas doblemente ligadas?
+R//= Una lista doblemente ligada es una estructura de datos es una estructura
+de datos donde cada nodo contiene tres elementos:
+
+- Dato: La información que almacena el nodo.
+- Puntero al nodo anterior: Referencia al nodo previo en la lista.
+- Puntero al nodo siguiente: Referencia al nodo siguiente en la lista.
+
+Todo esto nos permite recorrer la lista en ambas direcciones, lo contrario a
+una lista simplemente ligada.
+
+2. Comparación con las listas simplemente ligadas:
+R//= A pesar de que las listas simplemente ligadas tiene un uso menor de memoria,
+estas no son igual de eficientes que las listas doblemente ligadas. A la hora de
+realizar el recorrido, terminan siendo mucho más eficientes las listas doblemente ligadas;
+pues estas pueden hacer su recorrido tanto hacia adelante, como para atrás.
+Por lo mismo, son más eficientes a la hora de insertar o eliminar nodos,
+pues se puede hacer sin necesidad de hacer un recorrido desde la cabeza de la lista.
+
+3. ¿Por qué usar liga doblemente ligada en este proyecto?
+R//= Necesitamos manejar una lista en la que se encuentran los empleados de una empresa,
+en este caso, los empleados de "TechSolutions Inc.". Para esto es importante
+el permitir una búsqueda de nodo eficaz (en ambos sentidos). Para ordenar la lista,
+sea de mayor a menor o viceversa, los algoritmos de ordenamiento siempre serán más eficaces
+si se permite un movimiento bidireccional.

@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Empleados - TechSolutions Inc.</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        h1, h2 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: space-between;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            flex: 1 1 45%;
+            min-width: 300px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        .action-button {
+            width: auto;
+            margin-right: 5px;
+            padding: 5px 10px;
+            font-size: 14px;
+        }
+        .delete-btn {
+            background-color: #e74c3c;
+        }
+        .delete-btn:hover {
+            background-color: #c0392b;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        .stat-card {
+            background: #fff;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+        .stat-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #3498db;
+        }
+        .error-message {
+            color: #e74c3c;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .success-message {
+            color: #2ecc71;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        #orderControls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        #orderControls select {
+            flex: 1;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Sistema de Gestión de Empleados - TechSolutions Inc.</h1>
+    
+    <div class="container">
+        <div class="card">
+            <h2>Agregar Empleado</h2>
+            <div class="form-group">
+                <label for="nombre">Nombre:</label>
+                <input type="text" id="nombre" placeholder="Ingrese el nombre del empleado">
+            </div>
+            <div class="form-group">
+                <label for="id">ID:</label>
+                <input type="number" id="id" placeholder="Ingrese el ID del empleado">
+            </div>
+            <div class="form-group">
+                <label for="salario">Salario:</label>
+                <input type="number" id="salario" step="0.01" placeholder="Ingrese el salario del empleado">
+            </div>
+            <button id="agregarEmpleado">Agregar Empleado</button>
+            <p id="mensajeAgregar" class="success-message hidden"></p>
+            <p id="errorAgregar" class="error-message hidden"></p>
+        </div>
+
+        <div class="card">
+            <h2>Buscar Empleado</h2>
+            <div class="form-group">
+                <label for="buscarId">ID del Empleado:</label>
+                <input type="number" id="buscarId" placeholder="Ingrese el ID a buscar">
+            </div>
+            <button id="buscarEmpleado">Buscar</button>
+            <div id="resultadoBusqueda" class="hidden">
+                <h3>Empleado Encontrado:</h3>
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-title">ID:</div>
+                        <div id="busquedaId"></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title">Nombre:</div>
+                        <div id="busquedaNombre"></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title">Salario:</div>
+                        <div id="busquedaSalario"></div>
+                    </div>
+                </div>
+            </div>
+            <p id="errorBusqueda" class="error-message hidden"></p>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Lista de Empleados</h2>
+        <div id="orderControls">
+            <select id="tipoOrden">
+                <option value="nombre">Ordenar por Nombre</option>
+                <option value="salario">Ordenar por Salario</option>
+            </select>
+            <select id="direccionOrden">
+                <option value="asc">Ascendente</option>
+                <option value="desc">Descendente</option>
+            </select>
+            <button id="aplicarOrden">Aplicar Orden</button>
+        </div>
+        <div id="listaContainer">
+            <table id="tablaEmpleados">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Salario</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="empleadosBody">
+                    <!-- Aquí se cargarán los empleados dinámicamente -->
+                </tbody>
+            </table>
+            <p id="sinEmpleados" class="hidden">No hay empleados registrados aún.</p>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Estadísticas de Salarios</h2>
+        <button id="actualizarEstadisticas">Actualizar Estadísticas</button>
+        <div id="estadisticasContainer" class="hidden">
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-title">Salario Promedio:</div>
+                    <div id="salarioPromedio"></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Mediana de Salarios:</div>
+                    <div id="medianaSlario"></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Salario Máximo:</div>
+                    <div id="salarioMaximo"></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Salario Mínimo:</div>
+                    <div id="salarioMinimo"></div>
+                </div>
+            </div>
+        </div>
+        <p id="errorEstadisticas" class="error-message hidden"></p>
+    </div>
+
+    <script>
+        // URL base de la API
+        const API_URL = 'http://localhost:5000';
+
+        // Función para mostrar mensajes de error
+        function mostrarError(elementId, mensaje) {
+            const element = document.getElementById(elementId);
+            element.textContent = mensaje;
+            element.classList.remove('hidden');
+            setTimeout(() => {
+                element.classList.add('hidden');
+            }, 5000);
+        }
+
+        // Función para mostrar mensajes de éxito
+        function mostrarExito(elementId, mensaje) {
+            const element = document.getElementById(elementId);
+            element.textContent = mensaje;
+            element.classList.remove('hidden');
+            setTimeout(() => {
+                element.classList.add('hidden');
+            }, 3000);
+        }
+
+        // Cargar lista de empleados
+        async function cargarEmpleados() {
+            try {
+                const response = await fetch(`${API_URL}/empleados`);
+                const data = await response.json();
+                
+                const tablaBody = document.getElementById('empleadosBody');
+                const sinEmpleados = document.getElementById('sinEmpleados');
+                
+                tablaBody.innerHTML = '';
+                
+                if (data.empleados && data.empleados.length > 0) {
+                    data.empleados.forEach(empleado => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${empleado.id}</td>
+                            <td>${empleado.nombre}</td>
+                            <td>$${empleado.salario.toFixed(1)}</td>
+                            <td>
+                                <button class="action-button delete-btn" data-id="${empleado.id}">Eliminar</button>
+                            </td>
+                        `;
+                        tablaBody.appendChild(row);
+                    });
+                    sinEmpleados.classList.add('hidden');
+                } else {
+                    sinEmpleados.classList.remove('hidden');
+                }
+                
+                // Agregar event listeners a los botones de eliminar
+                document.querySelectorAll('.delete-btn').forEach(button => {
+                    button.addEventListener('click', async () => {
+                        const id = button.getAttribute('data-id');
+                        await eliminarEmpleado(id);
+                    });
+                });
+            } catch (error) {
+                console.error('Error al cargar empleados:', error);
+                mostrarError('errorBusqueda', 'Error al comunicarse con el servidor');
+            }
+        }
+
+        // Agregar un nuevo empleado
+        async function agregarEmpleado() {
+            const nombre = document.getElementById('nombre').value.trim();
+            const id = parseInt(document.getElementById('id').value);
+            const salario = parseFloat(document.getElementById('salario').value);
+            
+            if (!nombre || isNaN(id) || isNaN(salario)) {
+                mostrarError('errorAgregar', 'Por favor complete todos los campos correctamente');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/empleados`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ nombre, id, salario })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    mostrarExito('mensajeAgregar', 'Empleado agregado correctamente');
+                    document.getElementById('nombre').value = '';
+                    document.getElementById('id').value = '';
+                    document.getElementById('salario').value = '';
+                    cargarEmpleados();
+                } else {
+                    mostrarError('errorAgregar', data.error || 'Error al agregar empleado');
+                }
+            } catch (error) {
+                console.error('Error al agregar empleado:', error);
+                mostrarError('errorAgregar', 'Error al comunicarse con el servidor');
+            }
+        }
+
+        // Buscar un empleado por ID
+        async function buscarEmpleado() {
+            const id = document.getElementById('buscarId').value;
+            
+            if (!id) {
+                mostrarError('errorBusqueda', 'Por favor ingrese un ID válido');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/empleados/${id}`);
+                const data = await response.json();
+                
+                const resultadoBusqueda = document.getElementById('resultadoBusqueda');
+                const errorBusqueda = document.getElementById('errorBusqueda');
+                
+                if (response.ok) {
+                    document.getElementById('busquedaId').textContent = data.empleado.id;
+                    document.getElementById('busquedaNombre').textContent = data.empleado.nombre;
+                    document.getElementById('busquedaSalario').textContent = `$${data.empleado.salario.toFixed(1)}`;
+                    
+                    resultadoBusqueda.classList.remove('hidden');
+                    errorBusqueda.classList.add('hidden');
+                } else {
+                    resultadoBusqueda.classList.add('hidden');
+                    mostrarError('errorBusqueda', data.error || 'Empleado no encontrado');
+                }
+            } catch (error) {
+                console.error('Error al buscar empleado:', error);
+                mostrarError('errorBusqueda', 'Error al comunicarse con el servidor');
+            }
+        }
+
+        // Eliminar un empleado
+        async function eliminarEmpleado(id) {
+            if (!confirm(`¿Está seguro que desea eliminar el empleado con ID ${id}?`)) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/empleados/${id}`, {
+                    method: 'DELETE'
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    alert('Empleado eliminado correctamente');
+                    cargarEmpleados();
+                } else {
+                    alert(data.error || 'Error al eliminar empleado');
+                }
+            } catch (error) {
+                console.error('Error al eliminar empleado:', error);
+                alert('Error al comunicarse con el servidor');
+            }
+        }
+
+        // Aplicar ordenamiento
+        async function aplicarOrden() {
+            const tipo = document.getElementById('tipoOrden').value;
+            const orden = document.getElementById('direccionOrden').value;
+            
+            try {
+                const response = await fetch(`${API_URL}/empleados/ordenar?tipo=${tipo}&orden=${orden}`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    cargarEmpleados();
+                } else {
+                    alert(data.error || 'Error al ordenar empleados');
+                }
+            } catch (error) {
+                console.error('Error al ordenar empleados:', error);
+                alert('Error al comunicarse con el servidor');
+            }
+        }
+
+        // Cargar estadísticas
+        async function cargarEstadisticas() {
+            try {
+                const response = await fetch(`${API_URL}/empleados/estadisticas`);
+                const data = await response.json();
+                
+                const estadisticasContainer = document.getElementById('estadisticasContainer');
+                const errorEstadisticas = document.getElementById('errorEstadisticas');
+                
+                if (response.ok) {
+                    document.getElementById('salarioPromedio').textContent = `$${data.promedio_salario}`;
+                    document.getElementById('medianaSlario').textContent = `$${data.mediana_salario}`;
+                    document.getElementById('salarioMaximo').textContent = `$${data.salario_maximo.salario.toFixed(1)} (${data.salario_maximo.empleado})`;
+                    document.getElementById('salarioMinimo').textContent = `$${data.salario_minimo.salario.toFixed(1)} (${data.salario_minimo.empleado})`;
+                    
+                    estadisticasContainer.classList.remove('hidden');
+                    errorEstadisticas.classList.add('hidden');
+                } else {
+                    estadisticasContainer.classList.add('hidden');
+                    mostrarError('errorEstadisticas', data.error || 'Error al cargar estadísticas');
+                }
+            } catch (error) {
+                console.error('Error al cargar estadísticas:', error);
+                mostrarError('errorEstadisticas', 'Error al comunicarse con el servidor');
+            }
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            // Cargar empleados al inicio
+            cargarEmpleados();
+            
+            // Agregar empleado
+            document.getElementById('agregarEmpleado').addEventListener('click', agregarEmpleado);
+            
+            // Buscar empleado
+            document.getElementById('buscarEmpleado').addEventListener('click', buscarEmpleado);
+            
+            // Aplicar orden
+            document.getElementById('aplicarOrden').addEventListener('click', aplicarOrden);
+            
+            // Actualizar estadísticas
+            document.getElementById('actualizarEstadisticas').addEventListener('click', cargarEstadisticas);
+        });
+    </script>
+</body>
+</html>
